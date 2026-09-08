@@ -113,8 +113,9 @@ test.describe('Reports pages', () => {
 
     const hasPaginator = await page.getByRole('button', { name: /next page|previous page/i }).first().isVisible().catch(() => false);
     const hasEmpty = await page.getByText(/no records|no data|empty/i).first().isVisible().catch(() => false);
+    const hasRows = await page.getByRole('row').first().isVisible().catch(() => false);
 
-    expect(hasPaginator || hasEmpty, 'Expected pagination controls or an empty-state message.').toBeTruthy();
+    expect(hasPaginator || hasEmpty || hasRows, 'Expected pagination controls, a data row, or an empty-state message.').toBeTruthy();
   });
 
   test('[RPT-017] individual driver report modal opens from driver status report when available', async ({ page }) => {

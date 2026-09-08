@@ -1,5 +1,5 @@
 {
-  "name": "3pl-tmdone-revamp",
+  "name": "3pl-tmdone",
   "version": "1.0.0",
   "description": "",
   "main": "index.js",
@@ -25,7 +25,8 @@
     "test:bird-eye-view": "playwright test tests/bird-eye-view.spec.ts --project=chromium",
     "test:navigation:id": "playwright test tests/navigation.spec.ts --project=chromium -g",
     "test:navigation": "playwright test tests/navigation.spec.ts --project=chromium",
-    "test:report": "playwright show-report"
+    "test:report": "playwright show-report",
+    "screenshots": "node scripts/capture-page-screenshots.js"
   },
   "keywords": [],
   "author": "",

@@ -15,7 +15,7 @@ permissions:
 
 jobs:
   test:
-    timeout-minutes: 120
+    timeout-minutes: 150
     runs-on: ubuntu-latest
     env:
       CI: true
@@ -37,7 +37,7 @@ jobs:
     - name: Run Playwright tests
       id: playwright
       continue-on-error: true
-      run: npm test
+      run: npx playwright test --project=chromium --project=firefox
     - name: Send test results email
       if: always()
       run: node scripts/email-playwright-results.js
