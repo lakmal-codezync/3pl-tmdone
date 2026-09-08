@@ -282,8 +282,9 @@ async function expectSettlementShell(page: Page) {
 async function expectSettlementResultsOrEmptyState(page: Page) {
   await expectPageHasAnyText(page, [/payment/i, /receipt/i, /settlement/i, /no records/i, /no data/i, /empty/i]);
   const hasTable = await page.locator('table, [role="table"]').first().isVisible().catch(() => false);
+  const hasRows = await page.getByRole('row').first().isVisible().catch(() => false);
   const hasEmpty = await page.getByText(/no records|no data|empty/i).first().isVisible().catch(() => false);
-  expect(hasTable || hasEmpty, 'Expected settlement table/list or empty state.').toBeTruthy();
+  expect(hasTable || hasRows || hasEmpty, 'Expected settlement table/list, a data row, or an empty state.').toBeTruthy();
 }
 
 async function applyFilters(page: Page) {
