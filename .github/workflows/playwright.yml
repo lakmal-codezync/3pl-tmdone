@@ -43,7 +43,7 @@ jobs:
       run: node scripts/email-playwright-results.js
       env:
         PLAYWRIGHT_JSON_RESULTS: test-results/results.json
-        TEST_RESULTS_EMAIL_TO: lakmal@codezync.com
+        TEST_RESULTS_EMAIL_TO: lakmal@codezync.com,dulara@codezync.com,nimsara@codezync.com,miyuru@codezync.com,arshaak@codezync.com
         SMTP_HOST: ${{ secrets.SMTP_HOST }}
         SMTP_PORT: ${{ secrets.SMTP_PORT }}
         SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}

@@ -26,7 +26,8 @@ async function main() {
     : [{ testId: 'RUNNER', explain: report.error || 'No Playwright JSON result file was found.', project: 'ci', status: 'fail' }];
 
   const summary = summarize(rows);
-  const subject = `[3PL Tests] ${summary.failed > 0 ? 'FAILED' : 'PASSED'} - ${summary.passed} pass, ${summary.failed} fail, ${summary.skipped} skipped`;
+  const runDate = new Date().toLocaleDateString('en-CA', { timeZone: 'Asia/Colombo' });
+  const subject = `TMDone 3pl Playwright Daily Run - ${runDate}`;
   const html = buildHtml(summary, rows);
   const text = buildText(summary, rows);
 
