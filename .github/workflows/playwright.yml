@@ -1,0 +1,61 @@
+name: 3PL Playwright Tests
+
+on:
+  push:
+    branches: [ main, master ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+  schedule:
+    # GitHub cron is UTC. 20:30 UTC = 02:00 Asia/Colombo.
+    - cron: '30 20 * * *'
+
+permissions:
+  contents: read
+
+jobs:
+  test:
+    timeout-minutes: 120
+    runs-on: ubuntu-latest
+    env:
+      CI: true
+      THREE_PL_BASE_URL: ${{ secrets.THREE_PL_BASE_URL }}
+      THREE_PL_ONE_COMPANY_USER: ${{ secrets.THREE_PL_ONE_COMPANY_USER }}
+      THREE_PL_ONE_COMPANY_PASSWORD: ${{ secrets.THREE_PL_ONE_COMPANY_PASSWORD }}
+      THREE_PL_MULTI_COMPANY_USER: ${{ secrets.THREE_PL_MULTI_COMPANY_USER }}
+      THREE_PL_MULTI_COMPANY_PASSWORD: ${{ secrets.THREE_PL_MULTI_COMPANY_PASSWORD }}
+      THREE_PL_INVALID_PASSWORD: ${{ secrets.THREE_PL_INVALID_PASSWORD }}
+    steps:
+    - uses: actions/checkout@v4
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install dependencies
+      run: npm ci
+    - name: Install Playwright Browsers
+      run: npx playwright install --with-deps
+    - name: Run Playwright tests
+      id: playwright
+      continue-on-error: true
+      run: npm test
+    - name: Send test results email
+      if: always()
+      run: node scripts/email-playwright-results.js
+      env:
+        PLAYWRIGHT_JSON_RESULTS: test-results/results.json
+        TEST_RESULTS_EMAIL_TO: lakmal@codezync.com
+        SMTP_HOST: ${{ secrets.SMTP_HOST }}
+        SMTP_PORT: ${{ secrets.SMTP_PORT }}
+        SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+        SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        SMTP_FROM: ${{ secrets.SMTP_FROM }}
+        SMTP_SECURE: ${{ secrets.SMTP_SECURE }}
+    - uses: actions/upload-artifact@v4
+      if: always()
+      with:
+        name: playwright-report
+        path: playwright-report/
+        retention-days: 30
+    - name: Fail workflow if Playwright failed
+      if: steps.playwright.outcome == 'failure'
+      run: exit 1

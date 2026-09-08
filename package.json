@@ -1,0 +1,38 @@
+{
+  "name": "3pl-tmdone-revamp",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "playwright test",
+    "test:3pl": "playwright test --project=chromium",
+    "test:3pl:headed": "playwright test --project=chromium --headed",
+    "test:id": "playwright test --project=chromium -g",
+    "test:login:id": "playwright test tests/login.spec.ts --project=chromium -g",
+    "test:login": "playwright test tests/login.spec.ts --project=chromium",
+    "test:auth": "playwright test tests/login.spec.ts --project=chromium",
+    "test:dashboard:id": "playwright test tests/dashboard.spec.ts --project=chromium -g",
+    "test:dashboard": "playwright test tests/dashboard.spec.ts --project=chromium",
+    "test:drivers:id": "playwright test tests/drivers.spec.ts --project=chromium -g",
+    "test:drivers": "playwright test tests/drivers.spec.ts --project=chromium",
+    "test:orders:id": "playwright test tests/orders.spec.ts --project=chromium -g",
+    "test:orders": "playwright test tests/orders.spec.ts --project=chromium",
+    "test:reports:id": "playwright test tests/reports.spec.ts --project=chromium -g",
+    "test:reports": "playwright test tests/reports.spec.ts --project=chromium",
+    "test:settlement:id": "playwright test tests/settlement.spec.ts --project=chromium -g",
+    "test:settlement": "playwright test tests/settlement.spec.ts --project=chromium",
+    "test:bird-eye-view:id": "playwright test tests/bird-eye-view.spec.ts --project=chromium -g",
+    "test:bird-eye-view": "playwright test tests/bird-eye-view.spec.ts --project=chromium",
+    "test:navigation:id": "playwright test tests/navigation.spec.ts --project=chromium -g",
+    "test:navigation": "playwright test tests/navigation.spec.ts --project=chromium",
+    "test:report": "playwright show-report"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "devDependencies": {
+    "@playwright/test": "^1.62.1",
+    "@types/node": "^26.2.0"
+  }
+}
