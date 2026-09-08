@@ -86,6 +86,7 @@ function collectRows(suites, parents = []) {
         rows.push({
           testId,
           explain,
+          group: nextParents.at(-1) || 'General',
           project: testCase.projectName || testCase.projectId || 'default',
           status: normalizeStatus(testCase),
         });
@@ -135,25 +136,53 @@ function summarize(rows) {
   );
 }
 
+function groupRows(rows) {
+  const groups = new Map();
+
+  for (const row of rows) {
+    if (!groups.has(row.group)) {
+      groups.set(row.group, []);
+    }
+    groups.get(row.group).push(row);
+  }
+
+  return groups;
+}
+
+function statusColors(status) {
+  if (status === 'pass') {
+    return { bg: '#dcfce7', fg: '#166534' };
+  }
+
+  if (status === 'skipped') {
+    return { bg: '#fef9c3', fg: '#854d0e' };
+  }
+
+  return { bg: '#fee2e2', fg: '#991b1b' };
+}
+
 function buildHtml(summary, rows) {
   const generatedAt = new Date().toISOString();
-  const rowHtml = rows
-    .map((row) => `
+  const groups = groupRows(rows);
+
+  const sectionsHtml = Array.from(groups.entries())
+    .map(([group, groupRowList]) => {
+      const rowHtml = groupRowList
+        .map((row) => {
+          const { bg, fg } = statusColors(row.status);
+          return `
       <tr>
         <td>${escapeHtml(row.testId)}</td>
         <td>${escapeHtml(row.explain)}</td>
         <td>${escapeHtml(row.project)}</td>
-        <td><strong>${escapeHtml(row.status)}</strong></td>
-      </tr>`)
-    .join('');
+        <td style="background: ${bg}; color: ${fg}; font-weight: bold;">${escapeHtml(row.status)}</td>
+      </tr>`;
+        })
+        .join('');
 
-  return `<!doctype html>
-<html>
-  <body style="font-family: Arial, sans-serif; color: #111827;">
-    <h2>3PL Playwright Test Results</h2>
-    <p>Generated at ${escapeHtml(generatedAt)}</p>
-    <p>Total: ${summary.total} | Pass: ${summary.passed} | Fail: ${summary.failed} | Skipped: ${summary.skipped}</p>
-    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%;">
+      return `
+    <h3>${escapeHtml(group)}</h3>
+    <table border="1" cellpadding="8" cellspacing="0" style="border-collapse: collapse; width: 100%; margin-bottom: 24px;">
       <thead>
         <tr style="background: #f3f4f6;">
           <th align="left">Test ID</th>
@@ -163,7 +192,17 @@ function buildHtml(summary, rows) {
         </tr>
       </thead>
       <tbody>${rowHtml}</tbody>
-    </table>
+    </table>`;
+    })
+    .join('');
+
+  return `<!doctype html>
+<html>
+  <body style="font-family: Arial, sans-serif; color: #111827;">
+    <h2>3PL Playwright Test Results</h2>
+    <p>Generated at ${escapeHtml(generatedAt)}</p>
+    <p>Total: ${summary.total} | Pass: ${summary.passed} | Fail: ${summary.failed} | Skipped: ${summary.skipped}</p>
+    ${sectionsHtml}
   </body>
 </html>`;
 }
@@ -172,12 +211,13 @@ function buildText(summary, rows) {
   const lines = [
     '3PL Playwright Test Results',
     `Total: ${summary.total} | Pass: ${summary.passed} | Fail: ${summary.failed} | Skipped: ${summary.skipped}`,
-    '',
-    'Test ID | Test Explain | Project | Status',
   ];
 
-  for (const row of rows) {
-    lines.push(`${row.testId} | ${row.explain} | ${row.project} | ${row.status}`);
+  for (const [group, groupRowList] of groupRows(rows)) {
+    lines.push('', group, 'Test ID | Test Explain | Project | Status');
+    for (const row of groupRowList) {
+      lines.push(`${row.testId} | ${row.explain} | ${row.project} | ${row.status}`);
+    }
   }
 
   return lines.join(os.EOL);
