@@ -20,16 +20,18 @@ The public login and logged-out route tests can run without credentials:
 npm test -- --project=chromium
 ```
 
-Authenticated specs need credentials. Copy `.env.example` to `.env`, then fill:
+Authenticated specs need credentials. Create a local `.env` file, then fill:
 
 ```ini
+THREE_PL_BASE_URL=https://3pl.demo.dr.tmd1.org
 THREE_PL_ONE_COMPANY_USER=
 THREE_PL_ONE_COMPANY_PASSWORD=
 THREE_PL_MULTI_COMPANY_USER=
 THREE_PL_MULTI_COMPANY_PASSWORD=
+THREE_PL_INVALID_PASSWORD=wrong-password-123
 ```
 
-When those values are missing, Playwright marks authenticated tests as skipped. The tests also retry transient navigation errors such as `ERR_NETWORK_CHANGED` and `ERR_INTERNET_DISCONNECTED`, which can happen while navigating to the remote UAT site.
+Local `.env` is ignored by git. When credentials are missing, Playwright marks authenticated tests as skipped. The tests also retry transient navigation errors such as `ERR_NETWORK_CHANGED` and `ERR_INTERNET_DISCONNECTED`, which can happen while navigating to the remote UAT site.
 
 ## GitHub Actions
 
