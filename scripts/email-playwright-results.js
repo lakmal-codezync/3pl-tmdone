@@ -298,7 +298,7 @@ function readResponse(socket) {
 function formatMessage(message) {
   const boundary = `boundary-${Date.now()}`;
   const headers = [
-    `From: ${message.from}`,
+    `From: "TMDone Playwright 3PL" <${extractEmail(message.from)}>`,
     `To: ${message.to.join(', ')}`,
     `Subject: ${message.subject}`,
     'MIME-Version: 1.0',
