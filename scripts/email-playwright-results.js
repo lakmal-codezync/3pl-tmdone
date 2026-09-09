@@ -83,12 +83,14 @@ function collectRows(suites, parents = []) {
       const explain = title.replace(/^\[[^\]]+\]\s*/, '').trim();
 
       for (const testCase of spec.tests || []) {
+        const status = normalizeStatus(testCase);
         rows.push({
           testId,
           explain,
           group: nextParents.at(-1) || 'General',
           project: testCase.projectName || testCase.projectId || 'default',
-          status: normalizeStatus(testCase),
+          status,
+          reason: status === 'fail' ? extractFailureReason(testCase) : '',
         });
       }
     }
@@ -117,6 +119,12 @@ function normalizeStatus(testCase) {
   }
 
   return 'fail';
+}
+
+function extractFailureReason(testCase) {
+  const lastResult = (testCase.results || []).at(-1);
+  const message = lastResult?.errors?.[0]?.message || lastResult?.error?.message;
+  return message ? message.split('\n')[0].trim() : 'Unknown failure';
 }
 
 function summarize(rows) {
@@ -176,6 +184,7 @@ function buildHtml(summary, rows) {
         <td>${escapeHtml(row.explain)}</td>
         <td>${escapeHtml(row.project)}</td>
         <td style="background: ${bg}; color: ${fg}; font-weight: bold;">${escapeHtml(row.status)}</td>
+        <td>${escapeHtml(row.reason)}</td>
       </tr>`;
         })
         .join('');
@@ -189,6 +198,7 @@ function buildHtml(summary, rows) {
           <th align="left">Test Explain</th>
           <th align="left">Project</th>
           <th align="left">Status</th>
+          <th align="left">Reason</th>
         </tr>
       </thead>
       <tbody>${rowHtml}</tbody>
@@ -214,9 +224,9 @@ function buildText(summary, rows) {
   ];
 
   for (const [group, groupRowList] of groupRows(rows)) {
-    lines.push('', group, 'Test ID | Test Explain | Project | Status');
+    lines.push('', group, 'Test ID | Test Explain | Project | Status | Reason');
     for (const row of groupRowList) {
-      lines.push(`${row.testId} | ${row.explain} | ${row.project} | ${row.status}`);
+      lines.push(`${row.testId} | ${row.explain} | ${row.project} | ${row.status} | ${row.reason}`);
     }
   }
 
